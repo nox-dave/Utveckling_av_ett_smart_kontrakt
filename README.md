@@ -1,57 +1,39 @@
-# Sample Hardhat 3 Beta Project (`mocha` and `ethers`)
+Inlämningsuppgift
+I den här inlämningsuppgiften får ni möjlighet att använda er av de koncept och verktyg som vi har gått igenom. Välj ett av nedanstående tre teman och utveckla sedan ett smart kontrakt i Solidity:
 
-This project showcases a Hardhat 3 Beta project using `mocha` for tests and the `ethers` library for Ethereum interactions.
+Utveckla ett kontrakt som fungerar som en prenumerationsplattform, där vem som helst kan skapa sin egen prenumerationstjänst.
+Varje skapad prenumerationstjänst ska ha en ägare, en avgift och en periodlängd (t.ex. 30 dagar), samt kunna pausas eller återupptas individuellt. Kontraktet ska ha funktioner för att betala för eller förlänga en prenumeration, kontrollera om en adress har en aktiv prenumeration, samt hämta slutdatum för aktiva prenumerationer. Det ska även vara möjligt att ge bort en prenumeration till någon annan. Skaparen av en prenumerationstjänst ska kunna ändra avgiften för prenumerationen, pausa eller återuppta just sin tjänst, samt ta ut de intäkter som har samlats in för den aktuella prenumerationen.
+ 
+Utveckla ett kontrakt som fungerar som en marknadsplats för säker betalning mellan köpare och säljare.
+Samtliga användare ska kunna lägga ut varor till försäljning, och en köpare ska kunna skicka pengar till kontraktet för att starta en affär. När säljaren markerar varan som skickad, och köparen bekräftar att den är mottagen, ska betalningen släppas till säljaren. Det ska även vara möjligt att avbryta affären och återbetala pengarna innan varan har markerats som skickad. Om en tvist uppstår ska en administratör kunna avgöra ärendet och antingen släppa pengarna till säljaren eller återbetala köparen.
+ 
+Utveckla ett kontrakt som fungerar som ett poängsystem för medlemmar, med möjlighet att byta in poäng mot belöningar.
+Vem som helst ska kunna gå med som medlem. Medlemmar ska kunna tjäna in poäng genom en funktion i kontraktet och själva kunna se sitt poängsaldo. Poäng ska dessutom kunna överföras mellan medlemmar, och en administratör ska kunna tilldela poäng vid behov. Kontraktet ska även innehålla en funktion för att byta in poäng mot belöningar (t.ex. T-shirt eller VIP-status), vilket nollställer eller minskar medlemmens poängsaldo.
+ 
 
-To learn more about the Hardhat 3 Beta, please visit the [Getting Started guide](https://hardhat.org/docs/getting-started#getting-started-with-hardhat-3). To share your feedback, join our [Hardhat 3 Beta](https://hardhat.org/hardhat3-beta-telegram-group) Telegram group or [open an issue](https://github.com/NomicFoundation/hardhat/issues/new) in our GitHub issue tracker.
+Grundläggande krav (G):
+Kontraktet ska innehåll följande element:
 
-## Project Overview
+Minst en struct eller enum
+Minst en mapping eller array
+En constructor
+Minst en custom modifier
+Minst ett event för att logga viktiga händelser
+Utöver ovanstående krav ska ni även skriva tester för kontraktet som täcker grundläggande funktionalitet. Säkerställer att alla viktiga funktioner fungerar som förväntat, samt att ni har ett test coverage på minst 40%.
 
-This example project includes:
+ 
 
-- A simple Hardhat configuration file.
-- Foundry-compatible Solidity unit tests.
-- TypeScript integration tests using `mocha` and ethers.js
-- Examples demonstrating how to connect to different types of networks, including locally simulating OP mainnet.
+För att nå VG ska ni uppfylla samtliga krav för G-nivå, samt:
 
-## Usage
+Kontraktet ska innehålla minst ett custom error, samt minst en require, en assert, och en revert
+Kontraktet ska innehålla en fallback och/eller receive funktion
+Distribuera ert smarta kontrakt till Sepolia och verifiera kontraktet på Etherscan. Länka till den verifierade kontraktssidan i er inlämning.
+Säkerställ att ert kontrakt har ett test coverage på minst 90%.
+Identifiera och implementera minst tre gasoptimeringar och/eller säkerhetsåtgärder i ert kontrakt (användning av senaste versionen av solidity eller optimizer räknas ej!). Förklara vilka åtgärder ni har vidtagit, varför de är viktiga, och hur de förbättrar gasanvändningen och/eller kontraktets säkerhet.
+ 
 
-### Running Tests
+Inlämning med publik GitHub-länk går bra, men bifoga då även .sol + test filen/filerna på itslearning. Om ni väljer att inte länka till ett GitHub repo, skicka in en zippad mapp med projektet, exkl node modules.
 
-To run all the tests in the project, execute the following command:
+ 
 
-```shell
-npx hardhat test
-```
-
-You can also selectively run the Solidity or `mocha` tests:
-
-```shell
-npx hardhat test solidity
-npx hardhat test mocha
-```
-
-### Make a deployment to Sepolia
-
-This project includes an example Ignition module to deploy the contract. You can deploy this module to a locally simulated chain or to Sepolia.
-
-To run the deployment to a local chain:
-
-```shell
-npx hardhat ignition deploy ignition/modules/Counter.ts
-```
-
-To run the deployment to Sepolia, you need an account with funds to send the transaction. The provided Hardhat configuration includes a Configuration Variable called `SEPOLIA_PRIVATE_KEY`, which you can use to set the private key of the account you want to use.
-
-You can set the `SEPOLIA_PRIVATE_KEY` variable using the `hardhat-keystore` plugin or by setting it as an environment variable.
-
-To set the `SEPOLIA_PRIVATE_KEY` config variable using `hardhat-keystore`:
-
-```shell
-npx hardhat keystore set SEPOLIA_PRIVATE_KEY
-```
-
-After setting the variable, you can run the deployment with the Sepolia network:
-
-```shell
-npx hardhat ignition deploy --network sepolia ignition/modules/Counter.ts
-```
+Lämna in ert projekt, inklusive källkod, en förklaring till era gasoptimeringar eller säkerhetsåtgärder, samt en länk till det verifierade kontraktet på Etherscan (om ni siktar på VG), senast 19 september 2025 kl 23.59.
