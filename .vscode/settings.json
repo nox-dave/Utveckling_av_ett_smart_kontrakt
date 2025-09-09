@@ -1,0 +1,18 @@
+{
+  "wake.compiler.solc.remappings": [
+    "@openzeppelin/=node_modules/@openzeppelin/",
+    "forge-std/=node_modules/forge-std/",
+    "hardhat/=node_modules/hardhat/"
+  ],
+  "background.enabled": true,
+  "background.useDefault": false,
+  "background.editor": {
+    "opacity": 0.1,
+    "size": "cover",
+    "position": "center",
+    "repeat": "no-repeat",
+    "customImages": [
+      "/home/shahazzad/Pictures/il_fullxfull.2698255667_4t4c.jpg"
+    ]
+  }
+}

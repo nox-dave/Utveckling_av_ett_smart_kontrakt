@@ -1,0 +1,39 @@
+{
+  "_format": "hh3-sol-build-info-1",
+  "id": "solc-0_8_24-5f23abd1303fa62ca099bf24bc46dc923a7ff638",
+  "solcVersion": "0.8.24",
+  "solcLongVersion": "0.8.24+commit.e11b9ed9",
+  "userSourceNameMap": {
+    "contracts/Counter.sol": "project/contracts/Counter.sol"
+  },
+  "input": {
+    "language": "Solidity",
+    "settings": {
+      "evmVersion": "shanghai",
+      "optimizer": {
+        "enabled": true,
+        "runs": 200
+      },
+      "outputSelection": {
+        "*": {
+          "": [
+            "ast"
+          ],
+          "*": [
+            "abi",
+            "evm.bytecode",
+            "evm.deployedBytecode",
+            "evm.methodIdentifiers",
+            "metadata"
+          ]
+        }
+      },
+      "remappings": []
+    },
+    "sources": {
+      "project/contracts/Counter.sol": {
+        "content": "// SPDX-License-Identifier: MIT\npragma solidity ^0.8.24;\n\ncontract Counter {\n    uint256 public count;\n\n    constructor() {\n        count = 0;\n    }\n\n    function inc() public {\n        count += 1;\n    }\n\n    function incBy(uint256 _amount) public {\n        count += _amount;\n    }\n\n    function dec() public {\n        count -= 1;\n    }\n\n    function get() public view returns (uint256) {\n        return count;\n    }\n}"
+      }
+    }
+  }
+}

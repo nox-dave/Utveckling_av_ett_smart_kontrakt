@@ -1,0 +1,72 @@
+{
+  "_format": "hh3-artifact-1",
+  "contractName": "Counter",
+  "sourceName": "contracts/Counter.sol",
+  "abi": [
+    {
+      "inputs": [],
+      "stateMutability": "nonpayable",
+      "type": "constructor"
+    },
+    {
+      "inputs": [],
+      "name": "count",
+      "outputs": [
+        {
+          "internalType": "uint256",
+          "name": "",
+          "type": "uint256"
+        }
+      ],
+      "stateMutability": "view",
+      "type": "function"
+    },
+    {
+      "inputs": [],
+      "name": "dec",
+      "outputs": [],
+      "stateMutability": "nonpayable",
+      "type": "function"
+    },
+    {
+      "inputs": [],
+      "name": "get",
+      "outputs": [
+        {
+          "internalType": "uint256",
+          "name": "",
+          "type": "uint256"
+        }
+      ],
+      "stateMutability": "view",
+      "type": "function"
+    },
+    {
+      "inputs": [],
+      "name": "inc",
+      "outputs": [],
+      "stateMutability": "nonpayable",
+      "type": "function"
+    },
+    {
+      "inputs": [
+        {
+          "internalType": "uint256",
+          "name": "_amount",
+          "type": "uint256"
+        }
+      ],
+      "name": "incBy",
+      "outputs": [],
+      "stateMutability": "nonpayable",
+      "type": "function"
+    }
+  ],
+  "bytecode": "0x608060405234801561000f575f80fd5b505f805561016d806100205f395ff3fe608060405234801561000f575f80fd5b5060043610610055575f3560e01c806306661abd14610059578063371303c0146100735780636d4ce63c1461007d57806370119d0614610084578063b3bcfa8214610097575b5f80fd5b6100615f5481565b60405190815260200160405180910390f35b61007b61009f565b005b5f54610061565b61007b6100923660046100e0565b6100b7565b61007b6100cf565b60015f808282546100b0919061010b565b9091555050565b805f808282546100c7919061010b565b909155505050565b60015f808282546100b09190610124565b5f602082840312156100f0575f80fd5b5035919050565b634e487b7160e01b5f52601160045260245ffd5b8082018082111561011e5761011e6100f7565b92915050565b8181038181111561011e5761011e6100f756fea26469706673582212206fb139e1cfa6e80cb6cdb0b3b6aeba9d6a4950029054b4f81b604bff2905790764736f6c63430008180033",
+  "deployedBytecode": "0x608060405234801561000f575f80fd5b5060043610610055575f3560e01c806306661abd14610059578063371303c0146100735780636d4ce63c1461007d57806370119d0614610084578063b3bcfa8214610097575b5f80fd5b6100615f5481565b60405190815260200160405180910390f35b61007b61009f565b005b5f54610061565b61007b6100923660046100e0565b6100b7565b61007b6100cf565b60015f808282546100b0919061010b565b9091555050565b805f808282546100c7919061010b565b909155505050565b60015f808282546100b09190610124565b5f602082840312156100f0575f80fd5b5035919050565b634e487b7160e01b5f52601160045260245ffd5b8082018082111561011e5761011e6100f7565b92915050565b8181038181111561011e5761011e6100f756fea26469706673582212206fb139e1cfa6e80cb6cdb0b3b6aeba9d6a4950029054b4f81b604bff2905790764736f6c63430008180033",
+  "linkReferences": {},
+  "deployedLinkReferences": {},
+  "immutableReferences": {},
+  "inputSourceName": "project/contracts/Counter.sol",
+  "buildInfoId": "solc-0_8_24-5f23abd1303fa62ca099bf24bc46dc923a7ff638"
+}
