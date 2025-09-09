@@ -112,4 +112,35 @@ contract Marketplace {
         admins[account] = false;
         emit RevokeAdmin(account);
     }
+
+    function listingItem(
+        string calldata title,
+        string calldata description,
+        uint256 price
+    ) public {
+        require(price > 0, "Price must be greater than 0");
+
+        for (uint i = 1; i <= itemCount; i++) {
+            Item storage item = items[i];
+            require(
+                item.owner != msg.sender ||
+                    keccak256(bytes(item.title)) != keccak256(bytes(title)),
+                "You have already added this item!"
+            );
+        }
+
+        uint256 currentListingId = nextListingId;
+        nextListingId++;
+        itemCount++;
+
+        listings[currentListingId] = Listing(
+            currentListingId,
+            msg.sender,
+            title,
+            description,
+            price,
+            true,
+            block.timestamp
+        );
+    }
 }
