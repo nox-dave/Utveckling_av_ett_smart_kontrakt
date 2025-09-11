@@ -13,8 +13,8 @@ contract Marketplace {
     mapping(address => bool) public admins;
     mapping(address => uint) public balances;
     mapping(uint256 => Deal) public deals;
-    mapping(address => uint256[]) public buyerDeals;
-    mapping(uint256 => uint256[]) public sellerDeals;
+    mapping(address => uint256[]) public buyerDeals; // För att spåra deals
+    mapping(uint256 => uint256[]) public sellerDeals; // För att spåra deals
     mapping(uint256 => uint256) public lockedFunds;
     mapping(uint256 => Listing) public listings;
 
@@ -134,5 +134,38 @@ contract Marketplace {
         emit ListingCreated();
     }
 
-    function purchaseItem(uint256 listingId) public payable {}
+    function purchaseItem(
+        uint256 listingId
+    ) public payable validListing(listingId) {
+        Listing storage listing = listings[listingId];
+        require(msg.value == listing.price, "Incorrect payment amount");
+        require(msg.sender != listing.seller, "Cannot buy your own item");
+
+        // Uppdatera state innan external interaktioner
+        uint256 currentDealId = nextDealId;
+        nextDealId++;
+
+        deals[currentDealId] = Deal({
+            dealId: currentDealId,
+            listingId: listingId,
+            seller: listing.seller,
+            buyer: msg.sender,
+            amount: msg.value,
+            isActive: true,
+            createdAt: block.timestamp,
+            shippedAt: 0
+        });
+
+        // Spåra deal för båda parter
+        buyerDeals[msg.sender].push(currentDealId);
+        sellerDeals[listingId].push(currentDealId);
+
+        // Lås in pengarna
+        lockedFunds[currentDealId] = msg.value;
+
+        // Deaktivera listing (såld)
+        listing.isActive = false;
+
+        emit DealCreated(msg.sender, msg.value);
+    }
 }
