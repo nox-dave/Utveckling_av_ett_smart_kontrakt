@@ -1,14 +1,11 @@
 Inlämningsuppgift
 I den här inlämningsuppgiften får ni möjlighet att använda er av de koncept och verktyg som vi har gått igenom. Välj ett av nedanstående tre teman och utveckla sedan ett smart kontrakt i Solidity:
 
-Utveckla ett kontrakt som fungerar som en prenumerationsplattform, där vem som helst kan skapa sin egen prenumerationstjänst.
-Varje skapad prenumerationstjänst ska ha en ägare, en avgift och en periodlängd (t.ex. 30 dagar), samt kunna pausas eller återupptas individuellt. Kontraktet ska ha funktioner för att betala för eller förlänga en prenumeration, kontrollera om en adress har en aktiv prenumeration, samt hämta slutdatum för aktiva prenumerationer. Det ska även vara möjligt att ge bort en prenumeration till någon annan. Skaparen av en prenumerationstjänst ska kunna ändra avgiften för prenumerationen, pausa eller återuppta just sin tjänst, samt ta ut de intäkter som har samlats in för den aktuella prenumerationen.
- 
+------------------------------------------------------------------------------------------
 Utveckla ett kontrakt som fungerar som en marknadsplats för säker betalning mellan köpare och säljare.
 Samtliga användare ska kunna lägga ut varor till försäljning, och en köpare ska kunna skicka pengar till kontraktet för att starta en affär. När säljaren markerar varan som skickad, och köparen bekräftar att den är mottagen, ska betalningen släppas till säljaren. Det ska även vara möjligt att avbryta affären och återbetala pengarna innan varan har markerats som skickad. Om en tvist uppstår ska en administratör kunna avgöra ärendet och antingen släppa pengarna till säljaren eller återbetala köparen.
- 
-Utveckla ett kontrakt som fungerar som ett poängsystem för medlemmar, med möjlighet att byta in poäng mot belöningar.
-Vem som helst ska kunna gå med som medlem. Medlemmar ska kunna tjäna in poäng genom en funktion i kontraktet och själva kunna se sitt poängsaldo. Poäng ska dessutom kunna överföras mellan medlemmar, och en administratör ska kunna tilldela poäng vid behov. Kontraktet ska även innehålla en funktion för att byta in poäng mot belöningar (t.ex. T-shirt eller VIP-status), vilket nollställer eller minskar medlemmens poängsaldo.
+------------------------------------------------------------------------------------------
+
  
 
 Grundläggande krav (G):

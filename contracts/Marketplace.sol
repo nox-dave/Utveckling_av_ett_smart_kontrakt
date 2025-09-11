@@ -7,26 +7,16 @@ contract Marketplace {
 
     address public owner;
 
-    uint public itemCount;
     uint256 public nextListingId = 1;
     uint256 public nextDealId = 1;
 
     mapping(address => bool) public admins;
     mapping(address => uint) public balances;
-    mapping(uint => Item) public items;
-
     mapping(uint256 => Deal) public deals;
     mapping(address => uint256[]) public buyerDeals;
     mapping(uint256 => uint256[]) public sellerDeals;
     mapping(uint256 => uint256) public lockedFunds;
     mapping(uint256 => Listing) public listings;
-
-    struct Item {
-        uint id;
-        address owner;
-        string title;
-        bool forSale;
-    }
 
     struct Deal {
         uint256 dealId;
@@ -120,18 +110,8 @@ contract Marketplace {
     ) public {
         require(price > 0, "Price must be greater than 0");
 
-        for (uint i = 1; i <= itemCount; i++) {
-            Item storage item = items[i];
-            require(
-                item.owner != msg.sender ||
-                    keccak256(bytes(item.title)) != keccak256(bytes(title)),
-                "You have already added this item!"
-            );
-        }
-
         uint256 currentListingId = nextListingId;
         nextListingId++;
-        itemCount++;
 
         listings[currentListingId] = Listing(
             currentListingId,
@@ -143,4 +123,6 @@ contract Marketplace {
             block.timestamp
         );
     }
+
+    function purchaseItem(uint256 listingId) public payable {}
 }
