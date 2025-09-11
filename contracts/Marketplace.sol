@@ -46,6 +46,14 @@ contract Marketplace {
 
     event GrantAdmin(address indexed account);
     event RevokeAdmin(address indexed account);
+    event ListingCreated();
+    event DealCreated(address indexed sender, uint256 amount);
+    event ItemShipped();
+    event DealCompleted();
+    event DealCancelled();
+    event DisputeRaised();
+    event DisputeResolved();
+    event FundsWithdrawn();
 
     enum DealStatus {
         PENDING,
@@ -122,6 +130,8 @@ contract Marketplace {
             true,
             block.timestamp
         );
+
+        emit ListingCreated();
     }
 
     function purchaseItem(uint256 listingId) public payable {}
