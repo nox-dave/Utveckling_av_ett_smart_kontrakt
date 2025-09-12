@@ -24,7 +24,7 @@ contract Marketplace {
         address seller;
         address buyer;
         uint256 amount;
-        bool isActive;
+        DealStatus status;
         uint256 createdAt;
         uint256 shippedAt;
     }
@@ -151,7 +151,7 @@ contract Marketplace {
             seller: listing.seller,
             buyer: msg.sender,
             amount: msg.value,
-            isActive: true,
+            status: DealStatus.PENDING,
             createdAt: block.timestamp,
             shippedAt: 0
         });
@@ -167,5 +167,19 @@ contract Marketplace {
         listing.isActive = false;
 
         emit DealCreated(msg.sender, msg.value);
+    }
+
+    function markAsShipped(
+        uint256 dealId
+    ) public validDeal(dealId) onlySeller(dealId) {
+        require(
+            deals[dealId].status == DealStatus.PENDING,
+            "Deal must be pending"
+        );
+
+        deals[dealId].status = DealStatus.SHIPPED;
+        deals[dealId].shippedAt = block.timestamp;
+
+        emit ItemShipped();
     }
 }
