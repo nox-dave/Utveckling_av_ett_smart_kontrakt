@@ -243,4 +243,27 @@ contract Marketplace {
 
         emit DisputeRaised();
     }
+
+    function resolveDispute(
+        uint256 dealId,
+        bool favorSeller
+    ) public validDeal(dealId) onlyAdmin {
+        require(
+            deals[dealId].status == DealStatus.DISPUTED,
+            "Deal must be disputed"
+        );
+
+        deals[dealId].status = DealStatus.RESOLVED;
+
+        uint256 amount = lockedFunds[dealId];
+        lockedFunds[dealId] = 0;
+
+        if (favorSeller) {
+            balances[deals[dealId].seller] += amount;
+        } else {
+            balances[deals[dealId].buyer] += amount;
+        }
+
+        emit DisputeResolved();
+    }
 }
