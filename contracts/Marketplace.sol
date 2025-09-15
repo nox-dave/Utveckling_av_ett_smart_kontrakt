@@ -229,4 +229,18 @@ contract Marketplace {
 
         emit DealCancelled();
     }
+
+    function raiseDispute(
+        uint256 dealId
+    ) public validDeal(dealId) onlyBuyerOrSeller(dealId) {
+        require(
+            deals[dealId].status == DealStatus.PENDING ||
+                deals[dealId].status == DealStatus.SHIPPED,
+            "Can only dispute pending or shipped deals"
+        );
+
+        deals[dealId].status = DealStatus.DISPUTED;
+
+        emit DisputeRaised();
+    }
 }
