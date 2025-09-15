@@ -20,10 +20,10 @@ contract Marketplace {
 
     // För köparen
     struct Deal {
-        uint256 dealId;
-        uint256 listingId;
         address seller;
         address buyer;
+        uint256 dealId;
+        uint256 listingId;
         uint256 amount;
         DealStatus status;
         uint256 createdAt;
@@ -272,6 +272,8 @@ contract Marketplace {
         require(bal > 0, "No balance to withdraw");
 
         balances[msg.sender] = 0;
+
+        assert(balances[msg.sender] == 0);
 
         (bool sent, ) = payable(msg.sender).call{value: bal}("");
         require(sent, "Failed to send Ether");

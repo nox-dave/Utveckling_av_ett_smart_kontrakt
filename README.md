@@ -34,3 +34,9 @@ Inlämning med publik GitHub-länk går bra, men bifoga då även .sol + test fi
  
 
 Lämna in ert projekt, inklusive källkod, en förklaring till era gasoptimeringar eller säkerhetsåtgärder, samt en länk till det verifierade kontraktet på Etherscan (om ni siktar på VG), senast 19 september 2025 kl 23.59.
+
+
+====================================================================================
+
+Förklaring till gasoptimeringar och säkerhetsåtgärder
+
