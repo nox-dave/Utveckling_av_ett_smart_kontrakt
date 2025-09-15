@@ -18,6 +18,7 @@ contract Marketplace {
     mapping(uint256 => uint256) public lockedFunds;
     mapping(uint256 => Listing) public listings;
 
+    // För köparen
     struct Deal {
         uint256 dealId;
         uint256 listingId;
@@ -29,6 +30,7 @@ contract Marketplace {
         uint256 shippedAt;
     }
 
+    // För säljaren
     struct Listing {
         uint256 listingId;
         address seller;
@@ -181,5 +183,23 @@ contract Marketplace {
         deals[dealId].shippedAt = block.timestamp;
 
         emit ItemShipped();
+    }
+
+    function confirmReceipt(
+        uint256 dealId
+    ) public validDeal(dealId) onlyBuyer(dealId) {
+        require(
+            deals[dealId].status == DealStatus.SHIPPED,
+            "Deal must be shipped"
+        );
+
+        deals[dealId].status = DealStatus.COMPLETED;
+
+        uint256 amount = lockedFunds[dealId];
+        lockedFunds[dealId] = 0;
+
+        balances[deals[dealId].seller] += amount;
+
+        emit DealCompleted();
     }
 }
