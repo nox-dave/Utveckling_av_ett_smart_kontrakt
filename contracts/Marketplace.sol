@@ -103,6 +103,15 @@ contract Marketplace {
         _;
     }
 
+    modifier onlyBuyerOrSeller(uint256 dealId) {
+        require(
+            deals[dealId].buyer == msg.sender ||
+                deals[dealId].seller == msg.sender,
+            "Only buyer or seller"
+        );
+        _;
+    }
+
     function grantAdmin(address account) external onlyOwner {
         admins[account] = true;
         emit GrantAdmin(account);
@@ -201,5 +210,23 @@ contract Marketplace {
         balances[deals[dealId].seller] += amount;
 
         emit DealCompleted();
+    }
+
+    function cancelDeal(
+        uint256 dealId
+    ) public validDeal(dealId) onlyBuyerOrSeller(dealId) {
+        require(
+            deals[dealId].status == DealStatus.PENDING,
+            "Deal must be pending"
+        );
+
+        deals[dealId].status = DealStatus.CANCELLED;
+
+        uint256 amount = lockedFunds[dealId];
+        lockedFunds[dealId] = 0;
+
+        balances[deals[dealId].buyer] += amount;
+
+        emit DealCancelled();
     }
 }
