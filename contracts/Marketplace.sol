@@ -17,6 +17,8 @@ contract Marketplace {
     uint256 public nextListingId = 1;
     uint256 public nextDealId = 1;
 
+    bool private locked;
+
     mapping(address => bool) public admins;
     mapping(address => uint) public balances;
     mapping(uint256 => Deal) public deals;
@@ -125,6 +127,14 @@ contract Marketplace {
         _;
     }
 
+    // Egen Reentrancy Guard (Open-Zeppelin Reentrancy Guard bättre men gjorde min egen som exempel)
+    modifier lock() {
+        require(!locked, "locked");
+        locked = true;
+        _;
+        locked = false;
+    }
+
     function grantAdmin(address account) external onlyOwner {
         admins[account] = true;
         emit GrantAdmin(account);
@@ -215,7 +225,7 @@ contract Marketplace {
 
     function confirmReceipt(
         uint256 dealId
-    ) public validDeal(dealId) onlyBuyer(dealId) {
+    ) public validDeal(dealId) onlyBuyer(dealId) lock {
         if (deals[dealId].status != DealStatus.SHIPPED) revert DealNotShipped();
 
         deals[dealId].status = DealStatus.COMPLETED;
@@ -230,7 +240,7 @@ contract Marketplace {
 
     function cancelDeal(
         uint256 dealId
-    ) public validDeal(dealId) onlyBuyerOrSeller(dealId) {
+    ) public validDeal(dealId) onlyBuyerOrSeller(dealId) lock {
         if (deals[dealId].status != DealStatus.PENDING) revert DealNotPending();
 
         deals[dealId].status = DealStatus.CANCELLED;
@@ -259,7 +269,7 @@ contract Marketplace {
     function resolveDispute(
         uint256 dealId,
         bool favorSeller
-    ) public validDeal(dealId) onlyAdmin {
+    ) public validDeal(dealId) onlyAdmin lock {
         if (deals[dealId].status != DealStatus.DISPUTED)
             revert DealNotDisputed();
 
@@ -277,17 +287,15 @@ contract Marketplace {
         emit DisputeResolved();
     }
 
-    function withdrawBalance() public {
+    function withdrawBalance() public lock {
         uint256 bal = balances[msg.sender];
         if (bal == 0) revert InsufficientBalance();
 
         balances[msg.sender] = 0;
-
         assert(balances[msg.sender] == 0);
+        emit FundsWithdrawn();
 
         (bool sent, ) = payable(msg.sender).call{value: bal}("");
         if (!sent) revert FailedToSendEther();
-
-        emit FundsWithdrawn();
     }
 }
