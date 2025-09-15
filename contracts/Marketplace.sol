@@ -266,4 +266,16 @@ contract Marketplace {
 
         emit DisputeResolved();
     }
+
+    function withdrawBalance() public {
+        uint256 bal = balances[msg.sender];
+        require(bal > 0, "No balance to withdraw");
+
+        balances[msg.sender] = 0;
+
+        (bool sent, ) = payable(msg.sender).call{value: bal}("");
+        require(sent, "Failed to send Ether");
+
+        emit FundsWithdrawn();
+    }
 }
