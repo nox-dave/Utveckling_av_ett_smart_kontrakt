@@ -4,6 +4,13 @@ pragma solidity ^0.8.30;
 contract Marketplace {
     error NotOwner();
     error NotAdmin();
+    error InvalidPrice();
+    error DealNotPending();
+    error DealNotShipped();
+    error InsufficientBalance();
+    error CannotBuyOwnItem();
+    error DealNotDisputed();
+    error FailedToSendEther();
 
     address public owner;
 
@@ -20,25 +27,31 @@ contract Marketplace {
 
     // För köparen
     struct Deal {
+        /*
+        Gas-optimisering: Packeterar variabler in i 'slots'. Originellt 8 storage slots, men blir nu 3 storage slots.
+        */
         address seller;
         address buyer;
-        uint256 dealId;
-        uint256 listingId;
-        uint256 amount;
+        uint128 amount; // Gas-optimisering: Ändrar uint256 till uint128
+        uint64 createdAt; // Gas-optimisering: Ändrar uint256 till uint64
+        uint32 dealId; // Gas-optimisering: Ändrar uint256 till uint32
+        uint32 listingId; // Gas-optimisering: Ändrar uint256 till uint32
+        uint64 shippedAt; // Gas-optimisering: Ändrar uint256 till uint64
         DealStatus status;
-        uint256 createdAt;
-        uint256 shippedAt;
     }
 
     // För säljaren
+    /*
+    Gas-optimisering: Packeterar variabler in i 'slots' istället för slumpmässig placering.
+    */
     struct Listing {
-        uint256 listingId;
         address seller;
+        bool isActive;
+        uint32 listingId;
+        uint64 createdAt;
+        uint128 price;
         string title;
         string description;
-        uint256 price;
-        bool isActive;
-        uint256 createdAt;
     }
 
     constructor() {
@@ -122,24 +135,30 @@ contract Marketplace {
         emit RevokeAdmin(account);
     }
 
+    /*
+        Gas-optimisering: Använder calldata istället för memory
+        */
     function listingItem(
         string calldata title,
         string calldata description,
         uint256 price
     ) public {
-        require(price > 0, "Price must be greater than 0");
+        if (price == 0) revert InvalidPrice(); // Gas-optimering: Använda Custom Error istället för string sparar gas
 
         uint256 currentListingId = nextListingId;
-        nextListingId++;
+        unchecked {
+            // Gas-optimisering / säkerhet: Använder 'unchecked' förhindrar overflow
+            nextListingId++;
+        }
 
         listings[currentListingId] = Listing(
-            currentListingId,
             msg.sender,
-            title,
-            description,
-            price,
             true,
-            block.timestamp
+            uint32(currentListingId),
+            uint64(block.timestamp),
+            uint128(price),
+            title,
+            description
         );
 
         emit ListingCreated();
@@ -149,21 +168,24 @@ contract Marketplace {
         uint256 listingId
     ) public payable validListing(listingId) {
         Listing storage listing = listings[listingId];
-        require(msg.value == listing.price, "Incorrect payment amount");
-        require(msg.sender != listing.seller, "Cannot buy your own item");
+        if (msg.value != listing.price) revert InvalidPrice();
+        if (msg.sender == listing.seller) revert CannotBuyOwnItem();
 
         // Uppdatera state innan external interaktioner
         uint256 currentDealId = nextDealId;
-        nextDealId++;
+        unchecked {
+            // Gas-optimisering / säkerhet: Använder 'unchecked' förhindrar overflow
+            nextDealId++;
+        }
 
         deals[currentDealId] = Deal({
-            dealId: currentDealId,
-            listingId: listingId,
             seller: listing.seller,
             buyer: msg.sender,
-            amount: msg.value,
+            amount: uint128(msg.value),
+            createdAt: uint64(block.timestamp),
+            dealId: uint32(currentDealId),
+            listingId: uint32(listingId),
             status: DealStatus.PENDING,
-            createdAt: block.timestamp,
             shippedAt: 0
         });
 
@@ -183,13 +205,10 @@ contract Marketplace {
     function markAsShipped(
         uint256 dealId
     ) public validDeal(dealId) onlySeller(dealId) {
-        require(
-            deals[dealId].status == DealStatus.PENDING,
-            "Deal must be pending"
-        );
+        if (deals[dealId].status != DealStatus.PENDING) revert DealNotPending();
 
         deals[dealId].status = DealStatus.SHIPPED;
-        deals[dealId].shippedAt = block.timestamp;
+        deals[dealId].shippedAt = uint64(block.timestamp);
 
         emit ItemShipped();
     }
@@ -197,10 +216,7 @@ contract Marketplace {
     function confirmReceipt(
         uint256 dealId
     ) public validDeal(dealId) onlyBuyer(dealId) {
-        require(
-            deals[dealId].status == DealStatus.SHIPPED,
-            "Deal must be shipped"
-        );
+        if (deals[dealId].status != DealStatus.SHIPPED) revert DealNotShipped();
 
         deals[dealId].status = DealStatus.COMPLETED;
 
@@ -215,10 +231,7 @@ contract Marketplace {
     function cancelDeal(
         uint256 dealId
     ) public validDeal(dealId) onlyBuyerOrSeller(dealId) {
-        require(
-            deals[dealId].status == DealStatus.PENDING,
-            "Deal must be pending"
-        );
+        if (deals[dealId].status != DealStatus.PENDING) revert DealNotPending();
 
         deals[dealId].status = DealStatus.CANCELLED;
 
@@ -233,11 +246,10 @@ contract Marketplace {
     function raiseDispute(
         uint256 dealId
     ) public validDeal(dealId) onlyBuyerOrSeller(dealId) {
-        require(
-            deals[dealId].status == DealStatus.PENDING ||
-                deals[dealId].status == DealStatus.SHIPPED,
-            "Can only dispute pending or shipped deals"
-        );
+        if (
+            deals[dealId].status != DealStatus.PENDING &&
+            deals[dealId].status != DealStatus.SHIPPED
+        ) revert DealNotPending();
 
         deals[dealId].status = DealStatus.DISPUTED;
 
@@ -248,10 +260,8 @@ contract Marketplace {
         uint256 dealId,
         bool favorSeller
     ) public validDeal(dealId) onlyAdmin {
-        require(
-            deals[dealId].status == DealStatus.DISPUTED,
-            "Deal must be disputed"
-        );
+        if (deals[dealId].status != DealStatus.DISPUTED)
+            revert DealNotDisputed();
 
         deals[dealId].status = DealStatus.RESOLVED;
 
@@ -269,14 +279,14 @@ contract Marketplace {
 
     function withdrawBalance() public {
         uint256 bal = balances[msg.sender];
-        require(bal > 0, "No balance to withdraw");
+        if (bal == 0) revert InsufficientBalance();
 
         balances[msg.sender] = 0;
 
         assert(balances[msg.sender] == 0);
 
         (bool sent, ) = payable(msg.sender).call{value: bal}("");
-        require(sent, "Failed to send Ether");
+        if (!sent) revert FailedToSendEther();
 
         emit FundsWithdrawn();
     }
