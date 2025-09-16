@@ -1,42 +1,128 @@
-Inlämningsuppgift
-I den här inlämningsuppgiften får ni möjlighet att använda er av de koncept och verktyg som vi har gått igenom. Välj ett av nedanstående tre teman och utveckla sedan ett smart kontrakt i Solidity:
+# Marketplace Smart Contract
 
-------------------------------------------------------------------------------------------
-Utveckla ett kontrakt som fungerar som en marknadsplats för säker betalning mellan köpare och säljare.
-Samtliga användare ska kunna lägga ut varor till försäljning, och en köpare ska kunna skicka pengar till kontraktet för att starta en affär. När säljaren markerar varan som skickad, och köparen bekräftar att den är mottagen, ska betalningen släppas till säljaren. Det ska även vara möjligt att avbryta affären och återbetala pengarna innan varan har markerats som skickad. Om en tvist uppstår ska en administratör kunna avgöra ärendet och antingen släppa pengarna till säljaren eller återbetala köparen.
-------------------------------------------------------------------------------------------
+Ett smart kontrakt för säker handel mellan köpare och säljare på Ethereum blockchain.
 
- 
+## Projektöversikt
 
-Grundläggande krav (G):
-Kontraktet ska innehåll följande element:
+Detta projekt implementerar en decentraliserad marknadsplats där användare kan:
+- Lägga ut varor till försäljning
+- Köpa varor med säker betalning
+- Hantera leveranser och bekräftelser
+- Lösa tvister genom administratörer
 
-Minst en struct eller enum
-Minst en mapping eller array
-En constructor
-Minst en custom modifier
-Minst ett event för att logga viktiga händelser
-Utöver ovanstående krav ska ni även skriva tester för kontraktet som täcker grundläggande funktionalitet. Säkerställer att alla viktiga funktioner fungerar som förväntat, samt att ni har ett test coverage på minst 40%.
+## Uppfyllda Krav för VG
 
- 
+### Grundläggande Krav (G)
+- ✅ **Struct och Enum**: `Deal`, `Listing` structs och `DealStatus` enum
+- ✅ **Mappings och Arrays**: Flera mappings för användare, deals, listings och balancer
+- ✅ **Constructor**: Sätter ägare och initial admin
+- ✅ **Custom Modifiers**: `onlyOwner`, `onlyAdmin`, `validListing`, `lock`, etc.
+- ✅ **Events**: 8 olika events för att logga viktiga händelser
+- ✅ **Test Coverage**: 98% test coverage
 
-För att nå VG ska ni uppfylla samtliga krav för G-nivå, samt:
+### VG-Krav
+- ✅ **Custom Errors**: 8 custom errors implementerade (t.ex. `NotOwner()`, `InvalidPrice()`)
+- ✅ **Require, Assert, Revert**: Alla tre används i kontraktet
+- ✅ **Fallback/Receive**: Båda funktioner implementerade för att ta emot ETH
+- ✅ **Sepolia Deployment**: Kontraktet är deployat och verifierat på Sepolia
+- ✅ **Test Coverage 90%+**: 98% test coverage uppnått
 
-Kontraktet ska innehålla minst ett custom error, samt minst en require, en assert, och en revert
-Kontraktet ska innehålla en fallback och/eller receive funktion
-Distribuera ert smarta kontrakt till Sepolia och verifiera kontraktet på Etherscan. Länka till den verifierade kontraktssidan i er inlämning.
-Säkerställ att ert kontrakt har ett test coverage på minst 90%.
-Identifiera och implementera minst tre gasoptimeringar och/eller säkerhetsåtgärder i ert kontrakt (användning av senaste versionen av solidity eller optimizer räknas ej!). Förklara vilka åtgärder ni har vidtagit, varför de är viktiga, och hur de förbättrar gasanvändningen och/eller kontraktets säkerhet.
- 
+**Verifierat Kontrakt på Etherscan:**
+https://sepolia.etherscan.io/address/0x986264ea75511244F7b153Ca453FE4a8b624aE9b#code
 
-Inlämning med publik GitHub-länk går bra, men bifoga då även .sol + test filen/filerna på itslearning. Om ni väljer att inte länka till ett GitHub repo, skicka in en zippad mapp med projektet, exkl node modules.
+## Gas-Optimeringar och Säkerhetsåtgärder
 
- 
+### Gas-Optimeringar
 
-Lämna in ert projekt, inklusive källkod, en förklaring till era gasoptimeringar eller säkerhetsåtgärder, samt en länk till det verifierade kontraktet på Etherscan (om ni siktar på VG), senast 19 september 2025 kl 23.59.
+1. **Struct Packing (Storage Slot Optimering)**
+   - `Deal` struct: Reducerad från 8 till 3 storage slots genom smart packning
+   - `Listing` struct: Optimerad layout för minimalt storage användning
+   - Använder mindre datatyper: `uint128`, `uint64`, `uint32` istället för `uint256`
 
+2. **Custom Errors istället för Strings**
+   - Sparar gas genom att använda custom errors istället för require strings
+   - Exempel: `revert InvalidPrice()` istället för `require(price > 0, "Invalid price")`
 
-====================================================================================
+3. **Calldata istället för Memory**
+   - Funktionsparametrar använder `calldata` för strings
+   - Sparar gas vid funktionsanrop
 
-Förklaring till gasoptimeringar och säkerhetsåtgärder
+4. **Unchecked Math**
+   - Använder `unchecked` blocks för säkra incrementeringar
+   - Förhindrar onödig overflow-kontroll när det är säkert
 
+### Säkerhetsåtgärder
+
+1. **Reentrancy Guard**
+   - Egen implementation av reentrancy protection med `lock` modifier
+   - Skyddar kritiska funktioner som `confirmReceipt`, `cancelDeal`, `resolveDispute`
+
+2. **Checks-Effects-Interactions Pattern**
+   - State uppdateras innan externa anrop
+   - Förhindrar reentrancy attacks
+
+3. **Access Control**
+   - Rollbaserad åtkomstkontroll med owner och admins
+   - Funktioner är skyddade med lämpliga modifiers
+
+4. **Input Validation**
+   - Validering av alla inputs med custom errors
+   - Kontroll av deal status innan operationer
+
+5. **Safe ETH Transfer**
+   - Använder `.call{value: amount}("")` för säkra ETH-överföringar
+   - Kontrollerar returvärde och revertar vid misslyckade överföringar
+
+## Funktionalitet
+
+### Grundläggande Funktioner
+- `listingItem()`: Skapa ny listing
+- `purchaseItem()`: Köp vara och starta deal
+- `markAsShipped()`: Säljare markerar som skickad
+- `confirmReceipt()`: Köpare bekräftar mottagning
+- `cancelDeal()`: Avbryt deal (endast pending status)
+
+### Tvist-hantering
+- `raiseDispute()`: Starta tvist
+- `resolveDispute()`: Admin löser tvist
+
+### Admin-funktioner
+- `grantAdmin()`: Ge admin-rättigheter
+- `revokeAdmin()`: Ta bort admin-rättigheter
+
+### Balans-hantering
+- `withdrawBalance()`: Ta ut intjänade medel
+
+## Testning
+
+Projektet innehåller omfattande tester:
+- **Marketplace.test.ts**: Funktionalitetstester (584 rader)
+- **MarketplaceGas.test.ts**: Gas-optimeringstester (356 rader)
+- **Test Coverage**: 98%
+
+Kör tester med:
+```bash
+npx hardhat test
+npx hardhat coverage
+```
+
+## Deployment
+
+Kontraktet är deployat på Sepolia testnet:
+```bash
+npx hardhat compile
+npx hardhat ignition deploy ignition/modules/Marketplace.ts --network sepolia
+npx hardhat verify --network sepolia [CONTRACT_ADDRESS]
+```
+
+## Teknik Stack
+
+- **Solidity**: ^0.8.28
+- **Hardhat**: Development environment
+- **Ethers.js**: Ethereum library
+- **Mocha/Chai**: Testing framework
+- **TypeScript**: Type safety
+
+## Säkerhetsöverväganden
+
+Kontraktet implementerar flera säkerhetsbestpraktiker men bör genomgå professionell säkerhetsgranskning innan produktionsanvändning. Den egna reentrancy guard-implementationen är ett proof of concept - OpenZeppelin's ReentrancyGuard rekommenderas för produktion.
