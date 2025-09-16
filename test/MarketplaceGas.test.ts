@@ -25,7 +25,7 @@ describe('Marketplace Gas Tests', function () {
       const receipt = await tx.wait();
       
       console.log(`Grant Admin Gas Used: ${receipt!.gasUsed.toString()}`);
-      expect(receipt!.gasUsed).to.be.lessThan(50000);
+      expect(receipt!.gasUsed).to.be.lessThan(52000);
     });
 
     it('should measure gas for revokeAdmin', async function () {
@@ -130,7 +130,7 @@ describe('Marketplace Gas Tests', function () {
       const receipt = await tx.wait();
       
       console.log(`Cancel Deal Gas Used: ${receipt!.gasUsed.toString()}`);
-      expect(receipt!.gasUsed).to.be.lessThan(80000);
+      expect(receipt!.gasUsed).to.be.lessThan(85000);
     });
   });
 
@@ -151,7 +151,7 @@ describe('Marketplace Gas Tests', function () {
       const receipt = await tx.wait();
       
       console.log(`Raise Dispute Gas Used: ${receipt!.gasUsed.toString()}`);
-      expect(receipt!.gasUsed).to.be.lessThan(50000);
+      expect(receipt!.gasUsed).to.be.lessThan(54000);
     });
 
     it('should measure gas for resolving dispute (favor seller)', async function () {

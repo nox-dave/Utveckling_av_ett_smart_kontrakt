@@ -1,5 +1,5 @@
 // SPDX-License-Identifier: MIT
-pragma solidity ^0.8.30;
+pragma solidity ^0.8.28;
 
 contract Marketplace {
     error NotOwner();
@@ -7,7 +7,6 @@ contract Marketplace {
     error InvalidPrice();
     error DealNotPending();
     error DealNotShipped();
-    error InsufficientBalance();
     error CannotBuyOwnItem();
     error DealNotDisputed();
     error FailedToSendEther();
@@ -127,7 +126,7 @@ contract Marketplace {
         _;
     }
 
-    // Egen Reentrancy Guard (Open-Zeppelin Reentrancy Guard bättre men gjorde min egen som exempel)
+    // Egen Reentrancy Guard (Open-Zeppelin Reentrancy Guard bättre men gjorde min egen som proof of concept)
     modifier lock() {
         require(!locked, "locked");
         locked = true;
@@ -136,6 +135,7 @@ contract Marketplace {
     }
 
     function grantAdmin(address account) external onlyOwner {
+        require(account != address(0), "Invalid address");
         admins[account] = true;
         emit GrantAdmin(account);
     }
@@ -154,6 +154,7 @@ contract Marketplace {
         uint256 price
     ) public {
         if (price == 0) revert InvalidPrice(); // Gas-optimering: Använda Custom Error istället för string sparar gas
+        if (bytes(title).length == 0) revert("Empty title not allowed");
 
         uint256 currentListingId = nextListingId;
         unchecked {
@@ -289,7 +290,7 @@ contract Marketplace {
 
     function withdrawBalance() public lock {
         uint256 bal = balances[msg.sender];
-        if (bal == 0) revert InsufficientBalance();
+        require(bal > 0, "No balance to withdraw");
 
         balances[msg.sender] = 0;
         assert(balances[msg.sender] == 0);
